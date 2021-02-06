@@ -13,9 +13,9 @@ app.config_from_object('django.conf:settings')
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 app.conf.beat_schedule = {
-    'Check_WS_24H': {
-        'task': 'tasker.views.app_status',
-        'schedule': crontab(hour=1, minute=0),
+    'Check_WS_10M': {
+        'task': 'tasker.views.check_dates',
+        'schedule': ((1*60)*10),
         #'args': request
     },
 }
