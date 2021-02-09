@@ -126,5 +126,5 @@ def check_dates():
             pass
         
         
-    return HttpResponse('{}{}{}{}'.format('Comprobando registros en el rango ', start, ' ', today))
+    return '{}{}{}{}'.format('Comprobando registros en el rango ', start, ' ', today)
 
