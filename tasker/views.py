@@ -34,11 +34,11 @@ from credits import views as credits_back
 
 # Create your views here.
 
-
-def app_status(request):
+@task()
+def app_status():
     client = Client(settings.FIMUBAC_WS)
-    zeep_obj = client.service.zfgAppState(settings.FIMUBAC_USER, settings.FIMUBAC_PASSWORD, '20200728')
-    
+    zeep_obj = client.service.zfgAppState(settings.FIMUBAC_USER, settings.FIMUBAC_PASSWORD, '20210301')
+    '''
     #Entrar al diccionario anidado que regresa Zeep, el primer 'Table' probablemente corresponde a los datos de una de las solicitudes de esa fecha
     zeep_dict_condensed = helpers.serialize_object(zeep_obj, dict)['_value_1']['_value_1']
     
@@ -63,14 +63,15 @@ def app_status(request):
     #response = '{}{}{}{}{}{}{}{}'.format('[App ID?]: ', zeep_dict_condensed['iAppId'], ' ', '[Status?]:', zeep_dict_condensed['iOpStatus'], ' ', '[vAppID?]:', zeep_dict_condensed['vAppId'] )
     
     #print(zeep_dict_condensed)
-    return HttpResponse('Checa la consola!')
+    '''
+    return print(zeep_obj)
 
 @task()
 def check_dates():
     client = Client(settings.FIMUBAC_WS)
 
     #declarar la fecha de inicio de busqueda como 2020-01-01
-    start = '2020-01-01'
+    start = '2021-01-01'
 
     #Obtener la fecha de hoy, para poder buscar en la DB
     today = date.today().strftime('%Y-%m-%d')
@@ -102,26 +103,36 @@ def check_dates():
                 try:
                     credit_app = CreditApplications.objects.get(investors_app_id=dict_app_id)
 
-                    '''
-                    print('Registro Encontrado!')
+                    print('\nRegistro Encontrado!')
                     print('{}{}'.format('WS Status: ', dict_app['iOpStatus']))
+                    print('{}{}'.format('iCreditId: ', dict_app['iCreditId']))
                     print('{}{}'.format('App Status: ', credit_app.investors_app_status))
                     print('{}{}'.format('App ID: ', credit_app.investors_app_id))
-                    '''
 
                     #Comprobar iOpStatus del WS al registro de la DB
                     if(int(dict_app['iOpStatus']) != int(credit_app.investors_app_status)):
                         print('{}{}{}{}{}'.format('iOpStatus Distinto al de la solicitud! ', 'WS: ', dict_app['iOpStatus'], ' DB: ', credit_app.investors_app_status))
-                        '''
+                        
                         #Cambiar registros en DB
                         credit_app.investors_app_status = int(dict_app['iOpStatus'])
+                        credit_app.modified_at = date.today()
+                        credit_app.save()
+
+                    #Comprobar el campo iCreditId del WS y guardar el registro en el lugar indicado
+                    if(dict_app['iCreditId'] != credit_app.credit_number and int(dict_app['iCreditId']) != 0):
+                        print('{}{}'.format('iCreditId distinto a 0, se hará el cambio con: ', dict_app['iCreditId']))
+
+                        #Cambiar el registro en DB
+                        '''
+                        credit_app.credit_number = dict_app['iCreditId']
                         credit_app.save()
                         '''
+
+                    print('*' * 25)
 
                 except:
                     pass
 
-            print('*' * 25)
         except:
             pass
         

@@ -15,7 +15,7 @@ class Agreements(TimestampsModel):
 	'''
 	agreement Model: agreement info
 	'''
-	discount_key		= models.CharField('clave de descuento', max_length=50 )
+	discount_key		= models.CharField('clave de descuento', max_length=50)
 	agreement_name		= models.CharField('nombre de convenio', max_length=150)
 	agreement_type		= models.CharField('tipo de convenio', max_length=20)
 	start_date			= models.DateField('fecha de inicio del convenio', blank=True)
@@ -29,6 +29,7 @@ class Agreements(TimestampsModel):
 	deactivated_at		= models.DateTimeField('fecha de desactivación', null=True, blank=True)
 	deactivated_by		= models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name='desactivado por', related_name='agmt_deactivated_by')
 	organization		= models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True, verbose_name='id organización', related_name='organization_id')
+	external_id			= models.CharField('Clave externa', max_length=4, null=False, unique=True)
 
 	class Meta:
 		db_table = 'TA003'
@@ -56,16 +57,30 @@ class AgreementInvestors(TimestampsModel):
 		db_table = 'TAI017'
 
 
-# class AgreementInvestor(TimestampsModel):
-# 	investor			= models.ForeignKey(Investors, on_delete=models.PROTECT, null=False)
-# 	agreement			= models.OneToOneField(Agreements, on_delete=models.PROTECT, null=False)
-# 	investor_key		= models.CharField(max_length=10, null=False)
-# 	is_active			= models.BooleanField(default=True)
-# 	created_by			= models.ForeignKey(User, on_delete=models.PROTECT, null=False,
-# 												related_name='AgreementInvestorCreatedBy', db_column='created_by')
-# 	deactivated_at		= models.DateField(null=True)
-# 	deactivated_by		= models.ForeignKey(User, on_delete=models.PROTECT, null=True,
-# 												related_name='AgreementInvestorDeactivateddBy', db_column='deactivated_by')
+class Positions(TimestampsModel):
+	position_id			= models.AutoField(primary_key=True)
+	position_name		= models.CharField(max_length=250, null=False)
+	is_active			= models.BooleanField(default=True)
+	created_by			= models.ForeignKey(User, on_delete=models.PROTECT, null=False,
+												related_name='PositionCreatedBy', db_column='created_by')
+	deactivated_at		= models.DateField(null=True)
+	deactivated_by		= models.ForeignKey(User, on_delete=models.PROTECT, null=True,
+												related_name='PositionDeactivateddBy', db_column='deactivated_by')
 
-# 	class Meta:
-# 		db_table = 'TAP001'
+	class Meta:
+		db_table = 'TPS001'
+
+
+class Agreement_Positions(TimestampsModel):
+	agreement			= models.ForeignKey(Agreements, on_delete=models.PROTECT, null=False)
+	position			= models.ForeignKey(Positions, on_delete=models.PROTECT, null=False)
+	code				= models.CharField(max_length=25, null=True)
+	is_active			= models.BooleanField(default=True)
+	created_by			= models.ForeignKey(User, on_delete=models.PROTECT, null=False,
+												related_name='AgreementPositionCreatedBy', db_column='created_by')
+	deactivated_at		= models.DateField(null=True)
+	deactivated_by		= models.ForeignKey(User, on_delete=models.PROTECT, null=True,
+												related_name='AgreementPositionDeactivateddBy', db_column='deactivated_by')
+
+	class Meta:
+		db_table = 'TPS002'

@@ -14,8 +14,8 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 app.conf.beat_schedule = {
     'Check_WS_24H': {
-        'task': 'tasker.views.app_status',
-        'schedule': crontab(hour=1, minute=0),
+        'task': 'tasker.views.check_dates',
+        'schedule': 35,
         #'args': request
     },
 }
