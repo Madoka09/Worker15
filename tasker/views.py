@@ -123,10 +123,8 @@ def check_dates():
                         print('{}{}'.format('iCreditId distinto a 0, se hará el cambio con: ', dict_app['iCreditId']))
 
                         #Cambiar el registro en DB
-                        '''
                         credit_app.credit_number = dict_app['iCreditId']
                         credit_app.save()
-                        '''
 
                     print('*' * 25)
 
